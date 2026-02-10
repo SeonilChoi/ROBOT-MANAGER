@@ -1,6 +1,6 @@
-# ROBOT MOTION ENGINE
+# ROBOT MANAGER
 
-The Robot Motion Engine is a software framework for managing, planning, and controlling robot motion.
+The Robot Manager is a software framework for managing, planning, and controlling robot motion.
 It provides a modular architecture that separates robot management, motion planning, scheduling, and control.
 
 ---
