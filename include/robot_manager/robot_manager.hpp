@@ -11,6 +11,8 @@ public:
 
 private:
     void load_configurations(const std::string& config_file);
+
+    void initialize();
 };
 
 } // namespace micros
