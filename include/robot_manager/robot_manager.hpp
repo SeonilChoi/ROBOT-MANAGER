@@ -8,6 +8,9 @@ public:
     RobotManager(const std::string& config_file);
 
     ~RobotManager() = default;
+
+private:
+    void load_configurations(const std::string& config_file);
 };
 
 } // namespace micros
