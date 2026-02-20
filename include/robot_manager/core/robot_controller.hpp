@@ -24,6 +24,10 @@ public:
 
     uint8_t number_of_joints() const { return number_of_joints_; }
 
+    bool is_home() const { return is_home_; }
+
+    bool is_finished() const { return is_finished_; }
+
     const uint8_t* controller_idxs() const { return controller_idxs_; }
 
 protected:
@@ -34,6 +38,8 @@ protected:
     const uint8_t controller_idxs_[MAX_JOINT_SIZE]{};
 
     bool is_home_{false};
+
+    bool is_finished_{false};
 
     fsm_action_t last_action_{Action::STOP, 0.0};
 };

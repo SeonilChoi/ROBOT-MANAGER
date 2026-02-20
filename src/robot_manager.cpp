@@ -43,22 +43,12 @@ void micros::RobotManager::initialize_robot_manager()
 
 void micros::RobotManager::handle_robot_action()
 {
-    /**
     if (!is_home_) {
         is_home_ = set_all_robot_home();
     } else if (!is_finished_) {
         is_finished_ = set_all_robot_move();
     } else {
         set_all_robot_home();
-    }
-    **/
-    if (!is_home_) {
-        is_home_ = set_all_robot_home();
-    } else if (!is_finished_) {
-        is_finished_ = set_all_robot_move();
-    } else {
-        is_home_ = false;
-        is_finished_ = false;
     }
 }
 

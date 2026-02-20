@@ -5,7 +5,8 @@
 
 namespace micros {
 
-inline constexpr uint8_t MAX_JOINT_SIZE = 16; // Maximum number of joints.
+inline constexpr uint8_t MAX_JOINT_SIZE = 16;    // Maximum number of joints.
+inline constexpr uint8_t MAX_OBSTACLE_SIZE = 32; // Maximum number of obstacles.
 
 enum class State {
     STOPPED,
@@ -76,6 +77,13 @@ struct robot_state_t {
     twist_t twist;
     wrench_t wrench;
     joint_state_t joint_state;
+};
+
+struct obstacle_state_t {
+    uint8_t number_of_obstacles;
+    uint8_t id[MAX_OBSTACLE_SIZE];
+    position_t position[MAX_OBSTACLE_SIZE];
+    double radius[MAX_OBSTACLE_SIZE];
 };
 
 constexpr std::array<std::array<State, 3>, 3> transition_table{{
