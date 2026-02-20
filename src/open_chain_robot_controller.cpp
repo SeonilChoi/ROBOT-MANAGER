@@ -5,12 +5,12 @@ micros::OpenChainRobotController::OpenChainRobotController(const robot_config_t&
 
 void micros::OpenChainRobotController::initialize()
 {
-    
+
 }
 
 void micros::OpenChainRobotController::control(joint_state_t& joint_command)
 {
-
+    
 }
 
 void micros::OpenChainRobotController::update(const joint_state_t& joint_state)
