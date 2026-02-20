@@ -14,6 +14,8 @@ public:
 
     virtual void initialize() = 0;
 
+    virtual void set_action(const fsm_action_t& action) = 0;
+
     virtual void control(joint_state_t& joint_command) = 0;
 
     virtual void update(const joint_state_t& joint_state) = 0;
@@ -30,6 +32,10 @@ protected:
     const uint8_t number_of_joints_;
 
     const uint8_t controller_idxs_[MAX_JOINT_SIZE]{};
+
+    bool is_home_{false};
+
+    fsm_action_t last_action_{Action::STOP, 0.0};
 };
 
 }

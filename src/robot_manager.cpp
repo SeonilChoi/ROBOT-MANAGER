@@ -41,8 +41,66 @@ void micros::RobotManager::initialize_robot_manager()
     }
 }
 
+void micros::RobotManager::handle_robot_action()
+{
+    /**
+    if (!is_home_) {
+        is_home_ = set_all_robot_home();
+    } else if (!is_finished_) {
+        is_finished_ = set_all_robot_move();
+    } else {
+        set_all_robot_home();
+    }
+    **/
+    if (!is_home_) {
+        is_home_ = set_all_robot_home();
+    } else if (!is_finished_) {
+        is_finished_ = set_all_robot_move();
+    } else {
+        is_home_ = false;
+        is_finished_ = false;
+    }
+}
+
+bool micros::RobotManager::set_all_robot_home()
+{
+    for (uint8_t i = 0; i < robots_.size(); ++i) {
+        if (i == robot_idx_) {
+            robots_[i]->set_action(fsm_action_t{Action::HOME, 10.0});
+        } else {
+            robots_[i]->set_action(fsm_action_t{Action::STOP, 0.0});
+        }
+    }
+
+    if (robots_[robot_idx_]->is_home()) robot_idx_++;
+
+    if (robot_idx_ == robots_.size()) {
+        robot_idx_ = 0;
+        return true;
+    }
+    return false;
+}
+
+bool micros::RobotManager::set_all_robot_move()
+{
+    for (auto& robot : robots_) {
+        robot->set_action(fsm_action_t{Action::MOVE, 10.0});
+    }
+
+    if (robots_[robot_idx_]->is_finished()) robot_idx_++;
+
+    if (robot_idx_ == robots_.size()) {
+        robot_idx_ = 0;
+        return true;
+    }
+
+    return false;
+}
+
 void micros::RobotManager::control(motor_state_t* cmds, uint8_t& size)
 {
+    handle_robot_action();
+    
     for (auto& robot : robots_) {
         joint_state_t joint_command{};
         robot->control(joint_command);

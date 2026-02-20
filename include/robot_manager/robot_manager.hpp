@@ -22,7 +22,19 @@ private:
 
     void initialize_robot_manager();
 
+    void handle_robot_action();
+
+    bool set_all_robot_home();
+
+    bool set_all_robot_move();
+
     std::vector<std::unique_ptr<RobotController>> controllers_;
+
+    uint8_t robot_idx_{0};
+
+    bool is_home_{false};
+
+    bool is_finished_{false};
 };
 
 } // namespace micros

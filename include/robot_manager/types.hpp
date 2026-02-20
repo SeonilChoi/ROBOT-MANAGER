@@ -81,7 +81,7 @@ struct robot_state_t {
 constexpr std::array<std::array<State, 3>, 3> transition_table{{
     {State::STOPPED, State::OPERATING, State::HOMING},
     {State::STOPPED, State::OPERATING, State::INVALID},
-    {State::STOPPED, State::HOMING,    State::INVALID}
+    {State::STOPPED, State::INVALID,   State::HOMING}
 }};
 
 }

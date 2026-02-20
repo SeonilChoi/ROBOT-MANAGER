@@ -30,8 +30,8 @@ bool micros::FsmScheduler::step(const fsm_action_t& action, fsm_state_t& next_st
         if (next_state.state == State::HOMING) {
             current_state_.state = State::STOPPED;
             current_state_.progress = 0.0;
-            return true;
         }
+        return true;
     }
     
     return false;
