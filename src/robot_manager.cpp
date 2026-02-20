@@ -53,9 +53,9 @@ void micros::RobotManager::handle_robot_action()
     }
     **/
     if (!is_home_) {
-        is_home_ = set_all_robot_home();
+        set_all_robot_home();
     } else if (!is_finished_) {
-        is_finished_ = set_all_robot_move();
+        set_all_robot_move();
     } else {
         is_home_ = false;
         is_finished_ = false;
@@ -76,25 +76,27 @@ bool micros::RobotManager::set_all_robot_home()
 
     if (robot_idx_ == robots_.size()) {
         robot_idx_ = 0;
-        return true;
+        is_home_ = true;
     }
-    return false;
+    is_home_ = false;
 }
 
 bool micros::RobotManager::set_all_robot_move()
 {
+    uint8_t count = 0;
     for (auto& robot : robots_) {
-        robot->set_action(fsm_action_t{Action::MOVE, 10.0});
+        if (robot->is_finished()) {
+            robot->set_action(fsm_action_t{Action::STOP, 0.0});
+            count++;
+        } else {
+            robot->set_action(fsm_action_t{Action::MOVE, 10.0});
+        }
     }
 
-    if (robots_[robot_idx_]->is_finished()) robot_idx_++;
-
-    if (robot_idx_ == robots_.size()) {
-        robot_idx_ = 0;
-        return true;
+    if (count == robots_.size()) {
+        is_finished_ = true;
     }
-
-    return false;
+    is_finished_ = false;
 }
 
 void micros::RobotManager::control(motor_state_t* cmds, uint8_t& size)

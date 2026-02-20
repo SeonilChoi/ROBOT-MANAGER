@@ -24,9 +24,9 @@ private:
 
     void handle_robot_action();
 
-    bool set_all_robot_home();
+    void set_all_robot_home();
 
-    bool set_all_robot_move();
+    void set_all_robot_move();
 
     std::vector<std::unique_ptr<RobotController>> controllers_;
 
