@@ -7,18 +7,20 @@ namespace micros {
 
 class FsmScheduler : public Scheduler {
 public:
-    FsmScheduler(double T, double dt)
-    : Scheduler(T, dt) {}
+    FsmScheduler(double dt)
+    : Scheduler(dt) {}
 
     ~FsmScheduler() override = default;
 
     void reset() override;
 
-    void step(Action action) override;
+    void step() override;
 
-    void get_state() override;
+    bool tick(const fsm_action_t& action, fsm_state_t& next_state) override;
 
 private:
+    double progress_raw(double t) override;
+
     fsm_state_t current_state_;
 };
 

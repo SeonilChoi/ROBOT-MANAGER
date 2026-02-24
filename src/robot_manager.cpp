@@ -41,8 +41,8 @@ void micros::RobotManager::initialize_robot_manager()
     }
 }
 
-void micros::RobotManager::handle_robot_action()
-{
+void micros::RobotManager::control(motor_state_t* cmds, uint8_t& size)
+{   
     if (!is_home_) {
         is_home_ = set_all_robot_home();
     } else if (!is_finished_) {
@@ -50,12 +50,47 @@ void micros::RobotManager::handle_robot_action()
     } else {
         set_all_robot_home();
     }
+
+    for (auto& robot : robots_) {
+        joint_state_t joint_command{};
+        robot->control(joint_command);
+        for (uint8_t i = 0; i < joint_command.number_of_joints; ++i) {
+            cmds[size].target_id[0] = joint_command.target_id[i];
+            cmds[size].number_of_targets = 1;
+            cmds[size].controller_idx = joint_command.controller_idx[i];
+            cmds[size].position = joint_command.position[i];
+            cmds[size].velocity = joint_command.velocity[i];
+            cmds[size].torque = joint_command.torque[i];
+            size++;
+        }
+    }
+}
+
+void micros::RobotManager::update(const motor_state_t* states, const uint8_t size)
+{
+    for (auto& robot : robots_) {
+        joint_state_t joint_state{};
+        const uint8_t number_of_joints = robot->number_of_joints();
+        const uint8_t* controller_idxs = robot->controller_idxs();
+
+        joint_state.number_of_joints = number_of_joints;
+        for (uint8_t i = 0; i < number_of_joints; ++i) {
+            joint_state.controller_idx[i] = controller_idxs[i];
+            joint_state.position[i] = states[controller_idxs[i]].position;
+            joint_state.velocity[i] = states[controller_idxs[i]].velocity;
+            joint_state.torque[i] = states[controller_idxs[i]].torque;
+        }
+
+        robot->update(joint_state);
+    }
 }
 
 bool micros::RobotManager::set_all_robot_home()
 {
     for (uint8_t i = 0; i < robots_.size(); ++i) {
-        if (i == robot_idx_) {
+        if (robots_[i]->is_home()) {
+            robots_[i]->set_action(fsm_action_t{Action::STOP, 0.0});
+        } else if (i == robot_idx_) {
             robots_[i]->set_action(fsm_action_t{Action::HOME, 10.0});
         } else {
             robots_[i]->set_action(fsm_action_t{Action::STOP, 0.0});
@@ -87,43 +122,4 @@ bool micros::RobotManager::set_all_robot_move()
         return true;
     }
     return false;
-}
-
-void micros::RobotManager::control(motor_state_t* cmds, uint8_t& size)
-{
-    handle_robot_action();
-    
-    for (auto& robot : robots_) {
-        joint_state_t joint_command{};
-        robot->control(joint_command);
-
-        for (uint8_t i = 0; i < joint_command.number_of_joints; ++i) {
-            cmds[size].target_id[0] = joint_command.target_id[i];
-            cmds[size].number_of_targets = 1;
-            cmds[size].controller_idx = joint_command.controller_idx[i];
-            cmds[size].position = joint_command.position[i];
-            cmds[size].velocity = joint_command.velocity[i];
-            cmds[size].torque = joint_command.torque[i];
-            size++;
-        }
-    }
-}
-
-void micros::RobotManager::update(const motor_state_t* states, const uint8_t size)
-{
-    for (auto& robot : robots_) {
-        joint_state_t joint_state{};
-        const uint8_t number_of_joints = robot->number_of_joints();
-        const uint8_t* controller_idxs = robot->controller_idxs();
-
-        joint_state.number_of_joints = number_of_joints;
-        for (uint8_t i = 0; i < number_of_joints; ++i) {
-            joint_state.controller_idx[i] = controller_idxs[i];
-            joint_state.position[i] = states[controller_idxs[i]].position;
-            joint_state.velocity[i] = states[controller_idxs[i]].velocity;
-            joint_state.torque[i] = states[controller_idxs[i]].torque;
-        }
-
-        robot->update(joint_state);
-    }
 }

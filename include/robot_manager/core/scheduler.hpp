@@ -12,7 +12,9 @@ public:
 
     virtual void reset() = 0;
 
-    virtual bool step(const fsm_action_t& action, fsm_state_t& next_state) = 0;
+    virtual void step() = 0;
+
+    virtual bool tick(const fsm_action_t& action, fsm_state_t& next_state) = 0;
 
 protected:
     virtual double progress_raw(double t) = 0;
