@@ -41,8 +41,23 @@ void micros::OpenChainRobotController::control(joint_state_t& joint_command)
 
 void micros::OpenChainRobotController::update(const joint_state_t& joint_state)
 {
-    current_state_.pose = get_pose(joint_state);
-    current_state_.twist = get_twist(joint_state);
-    current_state_.wrench = get_wrench(joint_state);
+    get_pose(joint_state, current_state_.pose);
+    get_twist(joint_state, current_state_.twist);
+    get_wrench(joint_state, current_state_.wrench);
     current_state_.joint_state = joint_state;
+}
+
+void micros::OpenChainRobotController::get_pose(const joint_state_t& joint_state, pose_t& pose)
+{
+    forward_kinematics(joint_state.position, joint_state.number_of_joints, pose.position, pose.orientation);
+}
+
+void micros::OpenChainRobotController::get_twist(const joint_state_t& joint_state, twist_t& twist)
+{
+    forward_jacobian();
+}
+
+void micros::OpenChainRobotController::get_wrench(const joint_state_t& joint_state, wrench_t& wrench)
+{
+    inverse_dynamics();
 }
