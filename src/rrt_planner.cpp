@@ -11,6 +11,11 @@ namespace {
 
 constexpr double kPi = 3.14159265358979323846;
 
+double quintic_time_scaling(double t)
+{
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
 double joint_distance(const joint_state_t& a, const joint_state_t& b)
 {
     uint8_t n = std::min(a.number_of_joints, b.number_of_joints);
@@ -194,8 +199,6 @@ bool RrtPlanner::generate_trajectory(const robot_state_t& current_state, const r
                     cum += joint_distance(nodes[path[i - 1]], nodes[path[i]]]);
                 joint_state_t js = nodes[path[i]];
                 copy_joint_state_metadata(start, js);
-                for (uint8_t j = 0; j < n; ++j) js.velocity[j] = 0.0;
-                for (uint8_t j = 0; j < n; ++j) js.torque[j] = 0.0;
                 traj.emplace_back(t, js);
             }
             traj.front().first = 0.0;
@@ -227,7 +230,7 @@ void RrtPlanner::eval(double progress, joint_state_t& joint_command)
         return;
     }
 
-    progress = std::max(0.0, std::min(1.0, progress));
+    progress = std::max(0.0, std::min(1.0, quintic_time_scaling(progress)));
     size_t i = 0;
     while (i + 1 < trajectory_.size() && trajectory_[i + 1].first <= progress)
         ++i;

@@ -54,11 +54,11 @@ private:
 
     static constexpr size_t kMaxIterations = 5000;
     
-    static constexpr double kStepSize = 0.2;
+    static constexpr double kStepSize = 0.05; // [cm]
     
     static constexpr double kGoalBias = 0.1;
     
-    static constexpr double kGoalThreshold = 0.05;
+    static constexpr double kGoalThreshold = 0.05; // [cm]
 
     double joint_min_[MAX_JOINT_SIZE];
     
