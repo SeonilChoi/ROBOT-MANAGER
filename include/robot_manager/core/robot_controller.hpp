@@ -42,6 +42,8 @@ protected:
     bool is_finished_{false};
 
     fsm_action_t last_action_{Action::STOP, 0.0};
+
+    robot_state_t current_state_{};
 };
 
 }

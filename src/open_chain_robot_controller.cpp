@@ -5,7 +5,7 @@ micros::OpenChainRobotController::OpenChainRobotController(const robot_config_t&
 
 void micros::OpenChainRobotController::initialize()
 {
-
+    current_state_.id = id_;
 }
 
 void micros::OpenChainRobotController::set_action(const fsm_action_t& action)
@@ -41,5 +41,8 @@ void micros::OpenChainRobotController::control(joint_state_t& joint_command)
 
 void micros::OpenChainRobotController::update(const joint_state_t& joint_state)
 {
-
+    current_state_.pose = get_pose(joint_state);
+    current_state_.twist = get_twist(joint_state);
+    current_state_.wrench = get_wrench(joint_state);
+    current_state_.joint_state = joint_state;
 }
