@@ -105,3 +105,31 @@ void micros::LittleReader::stop()
         if (is_operating_) is_home_ =false;
     }
 }
+
+void micros::LittleReader::setup_stop()
+{
+    is_home_ = true;
+    is_moved_ = true;
+    is_stopped_ = false;
+}
+
+void micros::LittleReader::setup_move()
+{
+    is_home_ = true;
+    is_moved_ = false;
+    is_stopped_ = false;
+}
+
+void micros::LittleReader::setup_home()
+{
+    is_home_ = false
+    is_moved = true;
+    is_stopped = true;
+}
+
+void micros::LittleReader::setup_operating()
+{
+    is_home_ = false;
+    is_moved_ = false;
+    is_stopped_ = false;
+}
