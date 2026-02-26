@@ -85,9 +85,15 @@ void micros::LittleReader::move()
             count_++;
         } else if (current_fsm_state_.progress != 0.0) {
             joint_state_t current_joint_state{}, target_joint_state{};
+            current_joint_state = current_robot_state_.joint_state;
             if (count_ == 0) {
-
+                target_joint_state = target_robot_state_[0].joint_state;
+            } else if (count_ % 2 == 0) {
+                target_joint_state = target_robot_state_[0].joint_state;
+            } else if (count_ % 2 == 1) {
+                target_joint_state = target_robot_state_[1].joint_state;
             }
+            planner_->linear(current_joint_state, target_joint_state, obstacle_state_);
         }
     }
 
