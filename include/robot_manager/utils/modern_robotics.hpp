@@ -1,0 +1,10 @@
+#ifndef ROBOT_MANAGER_MODERN_ROBOTICS_HPP_
+#define ROBOT_MANAGER_MODERN_ROBOTICS_HPP_
+
+namespace micros {
+
+
+
+}
+
+#endif // ROBOT_MANAGER_MODERN_ROBOTICS_HPP_

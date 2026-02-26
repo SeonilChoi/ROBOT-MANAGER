@@ -30,11 +30,10 @@ bool micros::FsmScheduler::tick(const fsm_action_t& action, fsm_state_t& next_st
         return true;
     }
 
-    if (next_state.progress >= 1.0) {
+    if (next_state.progress == 1.0) {
         t_ = 0.0;
         if (next_state.state == State::HOMING) {
             current_state_.state = State::STOPPED;
-            current_state_.progress = 0.0;
         }
         return true;
     }

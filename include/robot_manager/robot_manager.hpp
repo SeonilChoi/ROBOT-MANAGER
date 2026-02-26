@@ -3,7 +3,6 @@
 
 #include <string>
 #include <memory>
-#include <vector>
 
 namespace micros {
 
@@ -20,21 +19,9 @@ public:
 private:
     void load_configurations(const std::string& config_file);
 
-    void initialize_robot_manager();
+    void initialize();
 
-    void handle_robot_action();
-
-    bool set_all_robot_home();
-
-    bool set_all_robot_move();
-
-    std::vector<std::unique_ptr<RobotController>> controllers_;
-
-    uint8_t robot_idx_{0};
-
-    bool is_home_{false};
-
-    bool is_finished_{false};
+    std::unique_ptr<Robot> robot_;
 };
 
 } // namespace micros
