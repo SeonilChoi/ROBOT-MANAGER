@@ -51,10 +51,17 @@ class RockingChairScheduler(Scheduler):
 class RockingChairPlanner(Planner):
     def __init__(self, motion_data: np.ndarray):
         super().__init__()
-        self.motion_data = motion_data
+        self.motion_data = np.asarray(motion_data)
+        if self.motion_data.ndim == 1:
+            self.motion_data = self.motion_data.reshape(1, -1)
 
     def eval(self, progress: float, duration: float, action: Action) -> np.ndarray:
+        progress = float(np.clip(progress, 0.0, 1.0))
+
         if action == Action.HOME:
+            if self.initial_state is None or self.goal_state is None:
+                raise RuntimeError("HOME action requires initial_state and goal_state.")
+
             delta = self.goal_state - self.initial_state
 
             scale = 10.0 * progress**3 - 15.0 * progress**4 + 6.0 * progress**5
@@ -64,6 +71,11 @@ class RockingChairPlanner(Planner):
 
         elif action == Action.MOVE:
             sample_count = self.motion_data.shape[1]
+            if sample_count == 0:
+                raise RuntimeError("MOVE action requires motion_data.")
+            if sample_count == 1:
+                return self.motion_data[:, 0].copy()
+
             sample_index = progress * (sample_count - 1)
             lower_index = int(np.floor(sample_index))
             upper_index = min(lower_index + 1, sample_count - 1)
@@ -74,6 +86,8 @@ class RockingChairPlanner(Planner):
             )
             return position
 
+        raise ValueError(f"Unsupported action: {action}.")
+
 
 class RockingChair(Robot):
     def __init__(self, config: robot_config_t, dt: float):
@@ -82,6 +96,10 @@ class RockingChair(Robot):
         self.number_of_controllers = len(self.controller_indices)
 
         self.scheduler = RockingChairScheduler(self.index, dt)
+        self.planner = RockingChairPlanner(self.motion_data)
+
+    def get_state_frame(self) -> state_frame_t:
+        return self.scheduler.get_state_frame()
 
     def set_action_frame(self, action_frame: action_frame_t) -> joint_frame_t:
         duration = 0
@@ -104,18 +122,18 @@ class RockingChair(Robot):
                 self.planner.set_initial_state(self.curr_joint_status.position)
                 self.planner.update_goal_state(self.home_positions)
 
-        progess = self.scheudler.get_state_frame().progress
-        position = self.planner.eval(progess, self.scheudler.duration, action_frame.action)
+        progress = self.scheduler.get_state_frame().progress
+        position = self.planner.eval(progress, self.scheduler.duration, action_frame.action)
         command = copy.deepcopy(self.init_joint_status)
         command.position = position
 
         restarted_segment = False
-        if action_frame.action == Action.HOME and progess >= 1.0:
+        if action_frame.action == Action.HOME and progress >= 1.0:
             self.stop_joint_status.position = self.home_positions
-        elif action_frame.action == Action.MOVE and progess >= 1.0:
+        elif action_frame.action == Action.MOVE and progress >= 1.0:
             self.stop_joint_status.position = position
             restarted_segment = True
 
         if not restarted_segment:
-            self.scheduelr.step()
+            self.scheduler.step()
         return command

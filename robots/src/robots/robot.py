@@ -37,8 +37,8 @@ class Scheduler(ABC):
 
 class Planner(ABC):
     def __init__(self):
-        self.initial_state: np.ndarray = None
-        self.goal_state: np.ndarray = None
+        self.initial_state: Optional[np.ndarray] = None
+        self.goal_state: Optional[np.ndarray] = None
 
     def set_initial_state(self, initial_state: np.ndarray):
         self.initial_state = np.asarray(initial_state).reshape(-1)

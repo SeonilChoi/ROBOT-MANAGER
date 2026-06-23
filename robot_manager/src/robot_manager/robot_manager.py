@@ -7,7 +7,13 @@ from common_robot_interface.joint_frame import joint_frame_t
 from common_robot_interface.state_frame import state_frame_t
 from common_robot_interface.action_frame import action_frame_t
 
-from robots.robot import Robot, robot_config_t
+from robots.rocking_chair import RockingChair
+from robots.robot import robot_config_t
+
+
+robot_classes = {
+    'rocking_chair': RockingChair,
+}
 
 class RobotManager:
     def __init__(self, config_file: str):
@@ -72,7 +78,11 @@ class RobotManager:
                 for target_interface_ids in robot['target_interface_ids']:
                     r_cfg.target_interface_ids.append(list(target_interface_ids))
 
-                self.robots.append(Robot(r_cfg, self._dt))
+                robot_class = robot_classes.get(r_cfg.name)
+                if robot_class is None:
+                    raise ValueError(f"Unsupported robot: {r_cfg.name}.")
+
+                self.robots.append(robot_class(r_cfg, self._dt))
                 self._number_of_robots += 1
 
     def updateJointStatus(self, joint_status: joint_frame_t):

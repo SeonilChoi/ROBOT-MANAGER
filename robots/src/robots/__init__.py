@@ -1,4 +1,5 @@
 from robots.robot import (
+    Controller,
     Planner,
     Robot,
     Scheduler,
