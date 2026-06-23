@@ -29,6 +29,9 @@ class RobotManager:
     def dt(self) -> float:
         return self._dt
 
+    def robot_indices(self) -> list[int]:
+        return [robot.index for robot in self.robots]
+
     def controller_indices(self) -> list[int]:
         return [
             controller_index
