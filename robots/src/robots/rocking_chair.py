@@ -22,6 +22,8 @@ class RockingChairScheduler(Scheduler):
     def __init__(self, robot_index: int, dt: float):
         super().__init__(robot_index, dt)
 
+        self.prev_time = 0.0
+
     def tick(self, action_frame: action_frame_t, duration: float) -> bool:
         current_state = self.get_state_frame()
         next_state = transition_table.get(
@@ -30,6 +32,12 @@ class RockingChairScheduler(Scheduler):
         )
 
         is_event = next_state != current_state.state
+
+        if is_event and action_frame.action == Action.STOP:
+            self.prev_time = self.time
+
+        if is_event and action_frame.action == Action.HOME:
+            self.prev_time = 0.0
 
         if action_frame.action == Action.STOP:
             self.duration = 0.0
@@ -41,6 +49,9 @@ class RockingChairScheduler(Scheduler):
             self.duration = duration
             self.time = 0.0
 
+        if is_event and action_frame.action == Action.MOVE and self.prev_time != 0.0:
+            self.time = self.prev_time
+        
         progress = self.progress(self.time + self.dt)
         if next_state == State.HOMING and progress >= 1.0:
             self.current_state = state_frame_t(robot_index=self.robot_index, state=State.STOPPED, progress=1.0)
@@ -52,8 +63,6 @@ class RockingChairPlanner(Planner):
     def __init__(self, motion_data: np.ndarray):
         super().__init__()
         self.motion_data = np.asarray(motion_data)
-        if self.motion_data.ndim == 1:
-            self.motion_data = self.motion_data.reshape(1, -1)
 
     def eval(self, progress: float, duration: float, action: Action) -> np.ndarray:
         progress = float(np.clip(progress, 0.0, 1.0))
@@ -98,6 +107,9 @@ class RockingChair(Robot):
         self.scheduler = RockingChairScheduler(self.index, dt)
         self.planner = RockingChairPlanner(self.motion_data)
 
+    def reset_scheduler(self):
+        self.scheduler.reset()
+
     def get_state_frame(self) -> state_frame_t:
         return self.scheduler.get_state_frame()
 
@@ -111,7 +123,7 @@ class RockingChair(Robot):
         is_event = self.scheduler.tick(action_frame, duration)
 
         if action_frame.action == Action.STOP:
-            if is_event:
+            if is_event or self.stop_joint_status is None:
                 self.stop_joint_status = copy.deepcopy(self.curr_joint_status)
             command = copy.deepcopy(self.stop_joint_status)
             command.controlword = self.init_joint_status.controlword.copy()
@@ -127,13 +139,11 @@ class RockingChair(Robot):
         command = copy.deepcopy(self.init_joint_status)
         command.position = position
 
-        restarted_segment = False
         if action_frame.action == Action.HOME and progress >= 1.0:
             self.stop_joint_status.position = self.home_positions
         elif action_frame.action == Action.MOVE and progress >= 1.0:
             self.stop_joint_status.position = position
-            restarted_segment = True
+            self.scheduler.reset(duration)
 
-        if not restarted_segment:
-            self.scheduler.step()
+        self.scheduler.step()
         return command

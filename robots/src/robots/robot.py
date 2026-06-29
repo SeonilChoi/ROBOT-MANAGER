@@ -1,7 +1,8 @@
 import copy
 
 from dataclasses import dataclass, field
-from typing import List, Optional, ABC, abstractmethod
+from abc import ABC, abstractmethod
+from typing import List, Optional
 
 import numpy as np
 
@@ -29,6 +30,10 @@ class Scheduler(ABC):
 
     def step(self):
         self.time += self.dt
+
+    def reset(self, duration: float):
+        self.duration = duration
+        self.time = 0.0
 
     @abstractmethod
     def tick(self, action_frame: action_frame_t, duration: float) -> bool:
@@ -82,7 +87,8 @@ class Robot(ABC):
 
         self.number_of_controllers = len(self._controller_indices)
 
-        self.motion_data = np.loadtxt(self.motion_data_file_path, delimiter=',').T.reshape(self.number_of_controllers, -1)
+        self.motion_data = np.loadtxt(self.motion_data_file_path, delimiter=',').reshape(self.number_of_controllers, -1)
+        self.motion_data = self.motion_data[self._controller_indices]
 
         self.init_joint_status: Optional[joint_frame_t] = joint_frame_t(
             controller_index=self._controller_indices,
@@ -91,8 +97,8 @@ class Robot(ABC):
             velocity=np.zeros(self.number_of_controllers),
             effort=np.zeros(self.number_of_controllers),
         )
-        self.curr_joint_status: Optional[joint_frame_t] = copy.deepcopy(self.init_joint_status)
-        self.stop_joint_status: Optional[joint_frame_t] = copy.deepcopy(self.init_joint_status)
+        self.curr_joint_status: Optional[joint_frame_t] = None #copy.deepcopy(self.init_joint_status)
+        self.stop_joint_status: Optional[joint_frame_t] = None #copy.deepcopy(self.init_joint_status)
 
     @property
     def controller_indices(self):
@@ -108,6 +114,10 @@ class Robot(ABC):
 
     def updateJointStatus(self, joint_status: joint_frame_t):
         self.curr_joint_status = joint_status
+
+    @abstractmethod
+    def reset_scheduler(self):
+        pass
 
     @abstractmethod
     def get_state_frame(self) -> state_frame_t:

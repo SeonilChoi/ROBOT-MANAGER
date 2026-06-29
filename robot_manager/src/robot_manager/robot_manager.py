@@ -122,3 +122,9 @@ class RobotManager:
             velocity=np.concatenate([command.velocity for command in commands]),
             effort=np.concatenate([command.effort for command in commands]),
         )
+
+    def reset_scheduler(self, robot_index: int):
+        for robot in self.robots:
+            if robot.index == robot_index:
+                robot.reset_scheduler()
+                break
