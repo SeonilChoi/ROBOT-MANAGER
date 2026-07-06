@@ -31,7 +31,6 @@ robot:
     home_positions: [0.0]
     home_duration: 5.0
     move_duration: 60.0
-    init_controlword: 0x103F
     motion_data_file_path: "../motions"
 ```
 
@@ -84,7 +83,6 @@ robot:
     home_positions: [0.0]
     home_duration: 5.0
     move_duration: 60.0
-    init_controlword: 0x103F
     motion_data_file_path: "../motions"
 ```
 

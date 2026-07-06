@@ -57,7 +57,6 @@ To be updated.
 | `home_positions` | `List[float]` | Home position for each `controller`. |
 | `home_duration` | `float` | `duration` value used in the `HOMING` state. |
 | `move_duration` | `float` | `duration` value used in the `OPERATING` state. |
-| `init_controlword` | `int` | Initial `controlword` value used to create the robot's default joint command. |
 | `motion_data_file_path` | `str` | Path to the motion data used in the `OPERATING` state. Relative paths are resolved from the robot config file directory by `RobotManager`. |
 
 ### `Robot`
@@ -128,7 +127,6 @@ from robots.robot import Scheduler
 | `home_positions` | `List[float]` | 각 `controller`의 홈 위치 |
 | `home_duration` | `float` | `HOMING` 상태에서 사용할 `duration` 값 |
 | `move_duration` | `float` | `OPERATING` 상태에서 사용할 `duration` 값 |
-| `init_controlword` | `int` | 로봇의 기본 joint command를 만들 때 사용할 초기 `controlword` 값 |
 | `motion_data_file_path` | `str` | `OPERATING` 상태에서 사용할 모션 데이터 경로. 상대 경로는 `RobotManager`가 robot config 파일 위치를 기준으로 해석한다. |
 
 ### `Robot`

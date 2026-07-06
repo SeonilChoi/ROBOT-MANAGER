@@ -71,7 +71,6 @@ class RobotManager:
                 r_cfg.home_positions = robot['home_positions']
                 r_cfg.home_duration = robot['home_duration']
                 r_cfg.move_duration = robot['move_duration']
-                r_cfg.init_controlword = robot['init_controlword']
 
                 motion_data_file_path = os.path.join(robot['motion_data_file_path'], f"{robot['name']}.csv")
                 if not os.path.isabs(motion_data_file_path):

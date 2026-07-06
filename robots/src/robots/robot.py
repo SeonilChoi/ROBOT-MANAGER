@@ -69,7 +69,6 @@ class robot_config_t:
     home_positions: List[float] = field(default_factory=list)
     home_duration: float = 0.0
     move_duration: float = 0.0
-    init_controlword: int = 0
     motion_data_file_path: str = ''
 
 class Robot(ABC):
@@ -82,7 +81,6 @@ class Robot(ABC):
         self.home_positions = np.array(config.home_positions)
         self.home_duration = config.home_duration
         self.move_duration = config.move_duration
-        self.init_controlword = config.init_controlword
         self.motion_data_file_path = config.motion_data_file_path
 
         self.number_of_controllers = len(self._controller_indices)
@@ -92,7 +90,7 @@ class Robot(ABC):
 
         self.init_joint_status: Optional[joint_frame_t] = joint_frame_t(
             controller_index=self._controller_indices,
-            controlword=np.array([self.init_controlword] * self.number_of_controllers),
+            controlword=np.zeros(self.number_of_controllers, dtype=np.uint16),
             position=np.zeros(self.number_of_controllers),
             velocity=np.zeros(self.number_of_controllers),
             effort=np.zeros(self.number_of_controllers),
