@@ -15,6 +15,22 @@ robot_classes = {
     'rocking_chair': RockingChair,
 }
 
+def resolve_resource_path(path: str, config_dir: str) -> str:
+    package_scheme = 'package://'
+    if path.startswith(package_scheme):
+        from ament_index_python.packages import get_package_share_directory
+
+        package_path = path[len(package_scheme):]
+        package_name, _, relative_path = package_path.partition('/')
+        if not package_name or not relative_path:
+            raise ValueError(f"Invalid package resource path: {path}")
+        return os.path.join(get_package_share_directory(package_name), relative_path)
+
+    if os.path.isabs(path):
+        return path
+
+    return os.path.join(config_dir, path)
+
 class RobotManager:
     def __init__(self, config_file: str):
         self.config_file = config_file
@@ -72,9 +88,12 @@ class RobotManager:
                 r_cfg.home_duration = robot['home_duration']
                 r_cfg.move_duration = robot['move_duration']
 
-                motion_data_file_path = os.path.join(robot['motion_data_file_path'], f"{robot['name']}.csv")
-                if not os.path.isabs(motion_data_file_path):
-                    motion_data_file_path = os.path.join(config_dir, motion_data_file_path)
+                motion_data_file_path = resolve_resource_path(
+                    robot['motion_data_file_path'],
+                    config_dir,
+                )
+                if os.path.splitext(motion_data_file_path)[1].lower() != '.csv':
+                    motion_data_file_path = os.path.join(motion_data_file_path, f"{robot['name']}.csv")
                 r_cfg.motion_data_file_path = os.path.normpath(motion_data_file_path)
 
                 for target_interface_ids in robot['target_interface_ids']:
