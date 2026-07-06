@@ -85,8 +85,7 @@ class Robot(ABC):
 
         self.number_of_controllers = len(self._controller_indices)
 
-        self.motion_data = np.loadtxt(self.motion_data_file_path, delimiter=',').reshape(self.number_of_controllers, -1)
-        self.motion_data = self.motion_data[self._controller_indices]
+        self.motion_data = self._load_motion_data()
 
         self.init_joint_status: Optional[joint_frame_t] = joint_frame_t(
             controller_index=self._controller_indices,
@@ -97,6 +96,21 @@ class Robot(ABC):
         )
         self.curr_joint_status: Optional[joint_frame_t] = None #copy.deepcopy(self.init_joint_status)
         self.stop_joint_status: Optional[joint_frame_t] = None #copy.deepcopy(self.init_joint_status)
+
+    def _load_motion_data(self) -> np.ndarray:
+        motion_data = np.atleast_2d(np.loadtxt(self.motion_data_file_path, delimiter=','))
+        if motion_data.shape[0] >= self.number_of_controllers + 1:
+            motion_data = motion_data[1:]
+
+        max_controller_index = (
+            int(np.max(self._controller_indices))
+            if self._controller_indices.size > 0
+            else -1
+        )
+        if motion_data.shape[0] > max_controller_index:
+            return motion_data[self._controller_indices]
+
+        return motion_data.reshape(self.number_of_controllers, -1)
 
     @property
     def controller_indices(self):

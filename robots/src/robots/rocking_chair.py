@@ -140,9 +140,10 @@ class RockingChair(Robot):
         command.position = position
 
         if action_frame.action == Action.HOME and progress >= 1.0:
-            self.stop_joint_status.position = self.home_positions
+            command.position = self.home_positions.copy()
+            self.stop_joint_status = copy.deepcopy(command)
         elif action_frame.action == Action.MOVE and progress >= 1.0:
-            self.stop_joint_status.position = position
+            self.stop_joint_status = copy.deepcopy(command)
             self.scheduler.reset(duration)
 
         self.scheduler.step()
