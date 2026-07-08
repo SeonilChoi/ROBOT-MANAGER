@@ -31,14 +31,15 @@ robot:
     home_positions: [0.0]
     home_duration: 5.0
     move_duration: 60.0
-    motion_data_file_path: "package://robot_manager/robots/motions"
+    motion_data_file_path: "rocking_chair.csv"
 ```
 
 `motion_data_file_path` may be a `package://` resource path, an absolute path, or a path relative to the YAML file directory.
 
-The provided `rocking_chair.csv` motion file is installed from
-`robots/motions`, so the default robot YAML can use
-`package://robot_manager/robots/motions`.
+In this workspace, runtime robot YAML and motion CSV files are kept under
+`~/colcon_ws/files/robot_manager`. The default robot YAML uses
+`motion_data_file_path: "rocking_chair.csv"`, so the CSV is resolved relative to
+the YAML file directory.
 
 ## API
 
@@ -87,13 +88,15 @@ robot:
     home_positions: [0.0]
     home_duration: 5.0
     move_duration: 60.0
-    motion_data_file_path: "package://robot_manager/robots/motions"
+    motion_data_file_path: "rocking_chair.csv"
 ```
 
 `motion_data_file_path`는 `package://` 리소스 경로, 절대 경로, 또는 YAML 파일 위치를 기준으로 한 상대 경로를 사용할 수 있다.
 
-기본 제공 `rocking_chair.csv` motion 파일은 `robots/motions`에서 설치되므로,
-기본 robot YAML은 `package://robot_manager/robots/motions`를 사용할 수 있다.
+이 workspace에서는 runtime robot YAML과 motion CSV 파일을
+`~/colcon_ws/files/robot_manager` 아래에 둔다. 기본 robot YAML은
+`motion_data_file_path: "rocking_chair.csv"`를 사용하므로, CSV는 YAML 파일
+위치 기준 상대 경로로 해석된다.
 
 ## API
 
